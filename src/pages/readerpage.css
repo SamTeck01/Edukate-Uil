@@ -1,0 +1,156 @@
+/* ================================================================
+   Reader Page — 3-column layout
+   Sources (~260px) | PDF VIEWER (flex 1, KING) | Chat (~320px)
+   ================================================================ */
+
+.reader-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+/* Loading state — "Opening material..." */
+.reader-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+}
+
+.reader-loading-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--text-muted);
+  animation: pulseOpacity 2s ease-in-out infinite;
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.reader-loading-bar {
+  width: 120px;
+  height: 4px;
+  background: var(--surface-warm);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  position: relative;
+}
+
+.reader-loading-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-pill);
+  animation: loadingSlide 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loadingSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* ======= 3-Column Layout ======= */
+.reader-layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Left — Sources */
+.reader-sources {
+  width: 260px;
+  min-width: 260px;
+  border-right: 1px solid var(--border);
+  background: var(--surface-card);
+  overflow-y: auto;
+  animation: slideInLeft 0.2s ease;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Center — PDF Viewer (main attraction) */
+.reader-center {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* prevents flex blowout */
+}
+
+/* Right — Chat panel (Ask Buhari) */
+.reader-chat {
+  width: 340px;
+  min-width: 340px;
+  border-left: 1px solid var(--border);
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideInRight 0.2s ease;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.04);
+  z-index: 10;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.reader-chat-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.reader-chat-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Maximized PDF — hides both sidebars */
+.reader-page--maximized .reader-sources,
+.reader-page--maximized .reader-chat {
+  display: none;
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 1200px) {
+  .reader-chat {
+    width: 300px;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .reader-sources {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  /* Hide chat panel on tablet — use bottom sheet instead */
+  .reader-chat {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Hide sources on mobile — use drawer/sheet */
+  .reader-sources {
+    display: none;
+  }
+}

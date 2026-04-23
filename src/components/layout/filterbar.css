@@ -1,0 +1,217 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) 0;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.filter-bar-left {
+  display: flex;
+  align-items: center;
+}
+
+.filter-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Circle icon button (search) — matches NotebookLM's circle search */
+.filter-circle-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-circle-btn:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* View toggle — like NotebookLM: ✓⊞ | ≡ side by side in a border group */
+.filter-view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-card);
+}
+
+.filter-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 var(--space-3);
+  height: 40px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-view-btn + .filter-view-btn {
+  border-left: 1px solid var(--border);
+}
+
+.filter-view-btn:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+.filter-view-btn--active {
+  color: var(--text);
+}
+
+.filter-view-check {
+  color: var(--text);
+}
+
+/* Sort dropdown — pill "Most recent ▼" */
+.filter-sort-wrap {
+  position: relative;
+}
+
+.filter-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.filter-sort-btn:hover {
+  border-color: var(--text-muted);
+}
+
+.filter-sort-chevron {
+  transition: transform var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.filter-sort-chevron--open {
+  transform: rotate(180deg);
+}
+
+.filter-sort-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dropdown);
+}
+
+.filter-sort-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: calc(var(--z-dropdown) + 1);
+  padding: var(--space-1);
+  animation: fadeInUp 0.12s ease;
+}
+
+.filter-sort-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-sort-option:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+.filter-sort-option--active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .filter-bar-right {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .filter-view-toggle {
+    display: none;
+  }
+
+  .filter-sort-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-bar {
+    flex-direction: row;
+    padding: var(--space-3) 0;
+    gap: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-bar-left {
+    flex-shrink: 0;
+  }
+
+  .filter-bar-right {
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  /* Hide view toggle, sort, and create on mobile — FAB replaces create */
+  .filter-view-toggle,
+  .filter-sort-wrap,
+  .filter-bar-right .btn {
+    display: none;
+  }
+
+  /* Smaller controls */
+  .filter-circle-btn {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -1,0 +1,184 @@
+/* ================================================================
+   Bottom Sheet — Fullscreen on mobile, half-sheet on tablet
+   ================================================================ */
+
+/* Backdrop — semi-transparent overlay */
+.bottom-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: var(--z-modal-backdrop);
+  animation: fadeIn 0.2s ease;
+}
+
+/* Sheet container */
+.bottom-sheet {
+  position: fixed;
+  z-index: var(--z-modal);
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ---- MOBILE: fullscreen like NotebookLM quiz ---- */
+@media (max-width: 768px) {
+  .bottom-sheet {
+    inset: 0 0 56px 0; /* Leave space for bottom bar */
+    border-radius: 0;
+  }
+
+  .bottom-sheet-backdrop {
+    display: none; /* No backdrop — sheet is fullscreen */
+  }
+
+  /* Drag handle hidden on mobile (no need — it's fullscreen) */
+  .bottom-sheet-drag {
+    display: none;
+  }
+}
+
+/* ---- TABLET: half-height bottom sheet ---- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .bottom-sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 80vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Hide mobile-style header on tablet — use drag handle instead */
+  .bottom-sheet-back {
+    display: none;
+  }
+
+  .bottom-sheet-close {
+    display: block;
+  }
+}
+
+/* ---- DESKTOP: side panel ---- */
+@media (min-width: 1025px) {
+  .bottom-sheet {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 400px;
+    border-radius: 0;
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-xl);
+    animation: slideInFromRight 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .bottom-sheet-drag {
+    display: none;
+  }
+
+  .bottom-sheet-back {
+    display: none;
+  }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* ======= Header ======= */
+.bottom-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+  min-height: 52px;
+}
+
+.bottom-sheet-back {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  border: none;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+.bottom-sheet-back:hover {
+  background: var(--surface-warm);
+}
+
+.bottom-sheet-title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bottom-sheet-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.bottom-sheet-close:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* ======= Drag handle (tablet only) ======= */
+.bottom-sheet-drag {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.bottom-sheet-drag:active {
+  cursor: grabbing;
+}
+
+.bottom-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+}
+
+/* ======= Content ======= */
+.bottom-sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* On mobile, add safe area padding at the bottom */
+@media (max-width: 768px) {
+  .bottom-sheet-content {
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  }
+}

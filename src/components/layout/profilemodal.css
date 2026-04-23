@@ -1,0 +1,192 @@
+/* ================================================================
+   Profile Modal — W3Schools-inspired popup
+   ================================================================ */
+
+.profile-modal {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: 320px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  z-index: 100;
+  transform-origin: top right;
+  animation: modalScaleIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Header */
+.profile-modal-header {
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--surface);
+}
+
+.profile-modal-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-1);
+}
+
+.profile-modal-email {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.profile-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: color-mix(in srgb, var(--dept-color, var(--primary)) 10%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.profile-modal-dept {
+  color: var(--dept-color, var(--primary));
+}
+
+.profile-modal-level {
+  color: var(--text-secondary);
+}
+
+/* Sections */
+.profile-modal-section {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.profile-modal-subtitle {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-3);
+}
+
+/* Progress Bar */
+.profile-modal-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.profile-modal-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--surface-warm);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.profile-modal-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-pill);
+  transition: width 1s ease-out;
+}
+
+.profile-modal-progress-text {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.profile-modal-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Streak */
+.profile-modal-streak {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.profile-modal-streak-icon {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+}
+
+.profile-modal-streak-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.profile-modal-streak-desc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+/* Actions */
+.profile-modal-actions {
+  padding: var(--space-2);
+}
+
+.profile-modal-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.profile-modal-action-btn:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+.profile-modal-signout {
+  color: var(--error);
+}
+
+.profile-modal-signout:hover {
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+  color: var(--error);
+}
+
+/* Mobile specific */
+@media (max-width: 480px) {
+  .profile-modal {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform-origin: bottom center;
+    animation: modalSlideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes modalSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+}

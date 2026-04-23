@@ -1,0 +1,167 @@
+.reader-navbar {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-card);
+  flex-shrink: 0;
+}
+
+.reader-navbar-inner {
+  height: 100%;
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.reader-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.reader-navbar-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-circle);
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+.reader-navbar-home:hover {
+  background: var(--surface-warm);
+}
+
+.reader-navbar-logo-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.reader-navbar-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reader-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* Panel toggle buttons (Sources / Chat / Maximize) */
+.reader-navbar-toggle {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.reader-navbar-toggle:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.reader-navbar-toggle--active {
+  background: var(--primary-light);
+  border-color: var(--primary-muted);
+  color: var(--primary);
+}
+
+/* Divider between toggle group and action buttons */
+.reader-navbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 var(--space-1);
+}
+
+/* Dark pill button "+ Create notebook" */
+.reader-navbar-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 34px;
+  padding: 0 var(--space-4);
+  background: var(--text);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.reader-navbar-pill:hover {
+  background: #374151;
+}
+
+/* Text + icon buttons "Share", "Settings" */
+.reader-navbar-text-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.reader-navbar-text-btn:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* Grid icon button */
+.reader-navbar-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.reader-navbar-icon-btn:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .reader-navbar {
+    display: none;
+  }
+}

@@ -1,0 +1,227 @@
+.sources-panel {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sources-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.sources-title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sources-header-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.sources-header-icon:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* Add sources button */
+.sources-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--space-3);
+}
+
+.sources-add-btn:hover {
+  border-color: var(--text-muted);
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* Search web bar */
+.sources-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  cursor: text;
+}
+
+.sources-search-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sources-search-text {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* Pills: Web, Fast Research */
+.sources-pills {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.sources-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: none;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sources-pill:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.sources-pill--highlight {
+  border-color: var(--primary-muted);
+  color: var(--primary);
+}
+
+.sources-pill-arrow {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.sources-pill-arrow:hover {
+  background: var(--surface-warm);
+  color: var(--text);
+}
+
+/* Divider */
+.sources-divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: var(--space-3);
+}
+
+/* Select all */
+.sources-select-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-bottom: var(--space-2);
+}
+
+.sources-select-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Checkbox */
+.sources-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sources-checkbox--checked {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Source list */
+.sources-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sources-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  width: 100%;
+}
+
+.sources-item:hover {
+  background: var(--surface-warm);
+}
+
+.sources-item--active {
+  background: var(--primary-light);
+}
+
+.sources-item-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sources-item-title {
+  flex: 1;
+  font-size: var(--text-sm);
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,0 +1,185 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.dashboard-content {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-16);
+}
+
+/* ========= Sections ========= */
+.dashboard-section {
+  margin-bottom: var(--space-10);
+}
+
+/* Section title — bigger, matching NotebookLM's "Featured notebooks" heading size */
+.dashboard-section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-5);
+}
+
+/* ========= Continue Studying row ========= */
+/* Same cards as Your Courses, laid out in a horizontal scrollable row */
+.dashboard-continue-row {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-continue-row::-webkit-scrollbar {
+  height: 0;
+  display: none;
+}
+
+.dashboard-continue-item {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+}
+
+/* "See all >" button — aligned right, below the continue row */
+.dashboard-see-all-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+
+.dashboard-see-all {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dashboard-see-all:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+/* ========= Course grid ========= */
+/* 4 columns on desktop like NotebookLM */
+.dashboard-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Skeleton loading cards */
+.course-card-skeleton {
+  height: 200px;
+  border-radius: var(--radius-lg);
+}
+
+/* ========= Footer ========= */
+.dashboard-footer {
+  text-align: center;
+  padding: var(--space-8) 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.dashboard-footer strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ========= Responsive ========= */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-continue-item {
+    flex: 0 0 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-content {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    padding-bottom: 100px; /* Space for FAB */
+  }
+
+  /* Single column list on mobile — like NotebookLM's mobile view */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .dashboard-section-title {
+    font-size: var(--text-lg);
+  }
+
+  /* Continue studying — smaller items */
+  .dashboard-continue-row {
+    gap: var(--space-3);
+  }
+
+  .dashboard-continue-item {
+    flex: 0 0 180px;
+  }
+}
+
+/* ========= Floating Action Button (mobile) ========= */
+.dashboard-fab {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .dashboard-fab {
+    display: flex;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    background: var(--surface-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-lg);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    z-index: var(--z-fixed);
+    transition: all var(--transition-fast);
+  }
+
+  .dashboard-fab:active {
+    transform: translateX(-50%) scale(0.96);
+  }
+
+  /* Hide the grid-based create card on mobile — FAB replaces it */
+  .course-card--create {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard-continue-item {
+    flex: 0 0 160px;
+  }
+}
