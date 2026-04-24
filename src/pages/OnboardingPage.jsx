@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import Button from '../components/shared/Button';
 import { useApp } from '../context/AppContext';
+import usePageMeta from '../hooks/usePageMeta';
 import './onboardingpage.css';
 
 const levels = [100, 200, 300, 400, 500];
@@ -17,6 +18,11 @@ const DEPT_STYLES = {
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { completeOnboarding, departments } = useApp();
+
+  usePageMeta({
+    title: 'Get Started — Edukate UIL',
+    description: 'Select your department and level to personalize your Edukate UIL experience.',
+  });
 
   const [step, setStep] = useState(1); // 1: department, 2: level
   const [selectedDept, setSelectedDept] = useState(null);

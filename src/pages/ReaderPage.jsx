@@ -12,10 +12,11 @@ import QuizViewer from '../components/reader/QuizViewer';
 import { useApp } from '../context/AppContext';
 import { getMaterialById, getMaterialsByCourse } from '../api/materialService';
 import { getCourseById } from '../api/courseService';
+import usePageMeta from '../hooks/usePageMeta';
 import './readerpage.css';
 
 /**
- * ReaderPage — THE core page of PhySci Hub.
+ * ReaderPage — THE core page of Edukate UIL.
  *
  * DESKTOP (>1024px):
  *   [ Sources (left) ] [ PDF VIEWER (center) ] [ Chat (right) ]
@@ -33,6 +34,11 @@ export default function ReaderPage() {
   const { materialId } = useParams();
   const navigate = useNavigate();
   const { user } = useApp();
+
+  usePageMeta({
+    title: material ? `${material.title} — Edukate UIL` : 'Reader — Edukate UIL',
+    description: material ? `Reading ${material.title} on Edukate UIL.` : 'Read lecture materials on Edukate UIL.',
+  });
 
   const [material, setMaterial] = useState(null);
   const [course, setCourse] = useState(null);

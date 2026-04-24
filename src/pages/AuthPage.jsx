@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/shared/Button';
 import { useApp } from '../context/AppContext';
+import usePageMeta from '../hooks/usePageMeta';
 import './authpage.css';
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const { login, signup, isAuthenticated, isOnboarded } = useApp();
+
+  usePageMeta({
+    title: 'Sign In — Edukate UIL',
+    description: 'Sign in or create your Edukate UIL account to access lecture materials, AI tutoring, and track your academic progress.',
+  });
 
   const [mode, setMode] = useState('login'); // login | signup
   const [email, setEmail] = useState('');
@@ -61,7 +67,7 @@ export default function AuthPage() {
         {/* Header */}
         <div className="auth-header">
           <span className="auth-logo">📖</span>
-          <h1 className="auth-title">PhySci Hub</h1>
+          <h1 className="auth-title">Edukate UIL</h1>
           <p className="auth-subtitle">
             {mode === 'login'
               ? 'Welcome back. Continue studying.'

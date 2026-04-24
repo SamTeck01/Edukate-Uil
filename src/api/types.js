@@ -1,5 +1,5 @@
 /**
- * PhySci Hub — Type Definitions (JSDoc)
+ * Edukate UIL — Type Definitions (JSDoc)
  * These mirror what the real Supabase schema will look like.
  */
 

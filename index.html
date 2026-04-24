@@ -2,27 +2,119 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="PhySci Hub - Centralized learning platform for the Faculty of Physical Sciences. Access lecture materials, AI tutoring, and track your progress." />
-    
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+
+    <!-- Primary Meta Tags -->
+    <title>Edukate UIL — Faculty of Physical Sciences Learning Platform</title>
+    <meta name="description" content="Edukate UIL is the centralized learning platform for the Faculty of Physical Sciences. Access verified lecture materials, get AI-powered summaries with Buhari, create flashcards, and track your academic progress — all in one place." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0D9488" />
+    <meta name="author" content="Edukate UIL" />
+    <meta name="keywords" content="Edukate UIL, Faculty of Physical Sciences, university learning platform, lecture materials, AI tutor, Buhari, study tracker, academic progress, flashcards, quizzes, online learning" />
+    <link rel="canonical" href="https://edukate-uil.com/" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://physcihub.com/" />
-    <meta property="og:title" content="PhySci Hub — Faculty of Physical Sciences" />
-    <meta property="og:description" content="Centralized learning platform for the Faculty of Physical Sciences. Access lecture materials, AI tutoring, and track your academic progress." />
-    <meta property="og:image" content="https://physci-hub-api.samadoye28.workers.dev/og-image.png" />
+    <meta property="og:url" content="https://edukate-uil.com/" />
+    <meta property="og:title" content="Edukate UIL — Faculty of Physical Sciences Learning Platform" />
+    <meta property="og:description" content="Access verified lecture materials, AI-powered summaries with Buhari, flashcards, quizzes, and track your academic progress. The centralized study platform for Physical Sciences students." />
+    <meta property="og:image" content="https://edukate-uil.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Edukate UIL" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://physcihub.com/" />
-    <meta property="twitter:title" content="PhySci Hub — Faculty of Physical Sciences" />
-    <meta property="twitter:description" content="Centralized learning platform for the Faculty of Physical Sciences. Access lecture materials, AI tutoring, and track your academic progress." />
-    <meta property="twitter:image" content="https://physci-hub-api.samadoye28.workers.dev/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://edukate-uil.com/" />
+    <meta name="twitter:title" content="Edukate UIL — Faculty of Physical Sciences Learning Platform" />
+    <meta name="twitter:description" content="Access verified lecture materials, AI-powered summaries with Buhari, flashcards, quizzes, and track your academic progress." />
+    <meta name="twitter:image" content="https://edukate-uil.com/og-image.png" />
 
-    <title>PhySci Hub — Faculty of Physical Sciences</title>
+    <!-- Structured Data: WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Edukate UIL",
+      "alternateName": "Edukate UIL Learning Platform",
+      "url": "https://edukate-uil.com",
+      "description": "Centralized learning platform for the Faculty of Physical Sciences. Access lecture materials, AI tutoring, and track your progress.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://edukate-uil.com/dashboard?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: EducationalOrganization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Edukate UIL",
+      "url": "https://edukate-uil.com",
+      "logo": "https://edukate-uil.com/favicon.svg",
+      "description": "Edukate UIL is a centralized learning platform built for the Faculty of Physical Sciences. It provides verified lecture materials, AI-powered study tools, and academic progress tracking.",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What makes Edukate UIL different from WhatsApp groups?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Edukate UIL provides a centralized, deduplicated repository for your exact department and level, complete with built-in AI study tools. No more scrolling through endless chat messages to find files."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who is Buhari?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Buhari is your inbuilt AI Study Assistant. It can read your lecture notes and automatically generate summaries, flashcards, and quizzes to help you learn faster and test your knowledge."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the duplicate-prevention system work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When a student uploads a new material, our backend hashes the file. If that exact file exists in the faculty's database, the upload is rejected. If it's new, it goes to moderators for approval."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Edukate UIL free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, this platform is built entirely for the Faculty of Physical Sciences students to ensure everyone has access to quality educational tools."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Preconnects & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://physci-hub-api.samadoye28.workers.dev" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>

@@ -39,7 +39,7 @@ export default function Navbar() {
         <div className="navbar-left">
           <button className="navbar-logo" onClick={() => navigate('/dashboard')}>
             <span className="navbar-logo-icon">📖</span>
-            <span className="navbar-logo-text">PhySci Hub</span>
+            <span className="navbar-logo-text">Edukate UIL</span>
           </button>
         </div>
 

@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext';
 import { getCourses, searchCourses } from '../api/courseService';
 import { getRecentMaterials } from '../api/materialService';
 import EmptyState from '../components/shared/EmptyState';
+import usePageMeta from '../hooks/usePageMeta';
 import './dashboardpage.css';
 
 const dashboardTabs = [
@@ -19,6 +20,11 @@ const dashboardTabs = [
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, isOnboarded } = useApp();
+
+  usePageMeta({
+    title: 'Dashboard — Edukate UIL',
+    description: 'View your courses, track study progress, and access lecture materials on Edukate UIL.',
+  });
 
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('grid');

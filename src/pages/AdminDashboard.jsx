@@ -6,10 +6,17 @@ import { useApp } from '../context/AppContext';
 import Navbar from '../components/layout/Navbar';
 import Button from '../components/shared/Button';
 import EngagementChart from '../components/admin/EngagementChart';
+import usePageMeta from '../hooks/usePageMeta';
 import './admindashboard.css';
 
 export default function AdminDashboard() {
   const { user } = useApp();
+
+  usePageMeta({
+    title: 'Admin Dashboard — Edukate UIL',
+    description: 'Manage users, departments, and review materials on the Edukate UIL admin panel.',
+  });
+
   const [activeTab, setActiveTab] = useState(user?.role === 'admin' ? 'users' : 'pending');
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -123,7 +130,7 @@ export default function AdminDashboard() {
           <div className="admin-header-main">
             <div className="admin-header-title">
               <h1>Buhari's Command Center</h1>
-              <p>PhySci Hub Faculty Management System</p>
+              <p>Edukate UIL Faculty Management System</p>
             </div>
             <div className="admin-header-actions">
               <span className="live-indicator">

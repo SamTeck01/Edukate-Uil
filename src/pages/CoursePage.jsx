@@ -7,6 +7,7 @@ import UploadModal from '../components/layout/UploadModal';
 import { useApp } from '../context/AppContext';
 import { getCourseById } from '../api/courseService';
 import { getMaterialsByCourse } from '../api/materialService';
+import usePageMeta from '../hooks/usePageMeta';
 import './coursepage.css';
 
 export default function CoursePage() {
@@ -19,6 +20,11 @@ export default function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  usePageMeta({
+    title: course ? `${course.title} — Edukate UIL` : 'Course — Edukate UIL',
+    description: course ? `Study ${course.title} (${course.code}) on Edukate UIL.` : 'View course materials on Edukate UIL.',
+  });
 
   const fetchData = async () => {
     setLoading(true);
