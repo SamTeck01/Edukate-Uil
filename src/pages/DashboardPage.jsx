@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
   // Convert recent materials to course-like objects for the same card style
   const recentAsCourses = useMemo(() => {
-    return recentMats.map(mat => ({
+    return (recentMats || []).map(mat => ({
       id: mat.id,
       code: mat.course_code || mat.courseCode,
       title: mat.title,
@@ -146,7 +146,7 @@ export default function DashboardPage() {
           <section className="dashboard-section animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
             <h2 className="dashboard-section-title">Continue studying</h2>
             <div className="dashboard-continue-row">
-              {recentAsCourses.map(item => (
+              {(recentAsCourses || []).map(item => (
                 <div key={item.id} className="dashboard-continue-item">
                   <CourseCard course={item} onClick={() => handleContinueClick(item)} />
                 </div>

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Settings } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 import './profilemodal.css';
 
 export default function ProfileModal({ user, dept, completionPercentage, onClose }) {
@@ -11,9 +12,12 @@ export default function ProfileModal({ user, dept, completionPercentage, onClose
     navigate('/auth');
   };
 
+  const { toast } = useToast();
+
   const handleSettings = () => {
     onClose();
-    navigate('/settings');
+    // navigate('/settings');
+    toast.info('Settings page is coming soon!');
   };
 
   if (!user) return null;
@@ -22,7 +26,7 @@ export default function ProfileModal({ user, dept, completionPercentage, onClose
     <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
       {/* Header Info */}
       <div className="profile-modal-header">
-        <div className="profile-modal-name">{user.name || 'Student'}</div>
+        <div className="profile-modal-name">{user.full_name || 'Student'}</div>
         <div className="profile-modal-email">{user.email || 'student@physci.edu'}</div>
         {dept && (
           <div className="profile-modal-badge" style={{ '--dept-color': dept.color }}>
@@ -53,7 +57,7 @@ export default function ProfileModal({ user, dept, completionPercentage, onClose
       <div className="profile-modal-section profile-modal-streak">
         <div className="profile-modal-streak-icon">🔥</div>
         <div className="profile-modal-streak-info">
-          <div className="profile-modal-streak-title">{user.studyStreak || 0} Day Streak!</div>
+          <div className="profile-modal-streak-title">{user.study_streak || 0} Day Streak!</div>
           <div className="profile-modal-streak-desc">Keep studying every day to maintain your streak.</div>
         </div>
       </div>

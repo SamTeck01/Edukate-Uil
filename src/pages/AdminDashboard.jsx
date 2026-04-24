@@ -17,13 +17,13 @@ export default function AdminDashboard() {
     description: 'Manage users, departments, and review materials on the Edukate UIL admin panel.',
   });
 
-  const [activeTab, setActiveTab] = useState(user?.role === 'admin' ? 'users' : 'pending');
+  const [activeTab, setActiveTab] = useState(user?.role === 'admin' ? 'users' : 'materials');
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statsData, setStatsData] = useState(null);
-  const [pendingMaterials, setPendingMaterials] = useState([]);
+  const [activeMaterials, setActiveMaterials] = useState([]);
   const toast = useToast();
   
   // New Dept Form
@@ -35,16 +35,16 @@ export default function AdminDashboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [usersData, deptsData, statsInfo, pendingData] = await Promise.all([
-          apiClient('/admin/users'),
+        const [usersData, deptsData, statsInfo, activeData] = await Promise.all([
+          user?.role === 'admin' ? apiClient('/admin/users') : Promise.resolve([]),
           apiClient('/courses/departments'),
           apiClient('/analytics/stats'),
-          apiClient('/admin/materials/pending')
+          apiClient('/admin/materials/active')
         ]);
-        setUsers(usersData);
+        if (user?.role === 'admin') setUsers(usersData);
         setDepartments(deptsData);
         setStatsData(statsInfo);
-        setPendingMaterials(pendingData);
+        setActiveMaterials(activeData);
       } catch (err) {
         console.error('Admin fetch error:', err);
       } finally {
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
       }
     }
     fetchData();
-  }, []);
+  }, [user]);
 
   const stats = {
     totalStudents: users.filter(u => u.role === 'student').length,
@@ -74,28 +74,31 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleApprove = async (id) => {
+  const handleRevoke = async (id) => {
+    if(!confirm('Are you sure you want to permanently delete this material?')) return;
     try {
-      await apiClient(`/admin/materials/${id}/approve`, { method: 'POST' });
-      setPendingMaterials(prev => prev.filter(m => m.id !== id));
-      toast.success('Material approved and published!');
+      await apiClient(`/admin/materials/${id}`, { method: 'DELETE' });
+      setActiveMaterials(prev => prev.filter(m => m.id !== id));
+      toast.info('Material revoked and deleted.');
     } catch (err) {
-      toast.error('Failed to approve material.');
+      toast.error('Failed to delete material.');
     }
   };
 
-  const handleReject = async (id) => {
+  const deleteDepartment = async (id) => {
+    if(!confirm('Are you sure you want to delete this department?')) return;
     try {
-      await apiClient(`/admin/materials/${id}/reject`, { method: 'POST' });
-      setPendingMaterials(prev => prev.filter(m => m.id !== id));
-      toast.info('Material rejected.');
+      await apiClient(`/admin/departments/${id}`, { method: 'DELETE' });
+      setDepartments(prev => prev.filter(d => d.id !== id));
+      toast.info('Department deleted.');
     } catch (err) {
-      toast.error('Failed to reject material.');
+      toast.error(err.message || 'Failed to delete department.');
     }
   };
 
-  const filteredPending = pendingMaterials.filter(m => 
-    m.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMaterials = activeMaterials.filter(m => 
+    m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.course_code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addDepartment = async (e) => {
@@ -192,12 +195,12 @@ export default function AdminDashboard() {
                 <span>Departments</span>
               </button>
               <button 
-                className={`admin-nav-item ${activeTab === 'pending' ? 'active' : ''}`}
-                onClick={() => setActiveTab('pending')}
+                className={`admin-nav-item ${activeTab === 'materials' ? 'active' : ''}`}
+                onClick={() => setActiveTab('materials')}
               >
                 <Clock size={18} />
-                <span>Pending Approvals</span>
-                {pendingMaterials.length > 0 && <span className="admin-badge">{pendingMaterials.length}</span>}
+                <span>Course Materials</span>
+                {activeMaterials.length > 0 && <span className="admin-badge">{activeMaterials.length}</span>}
               </button>
               <button 
                 className={`admin-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -342,23 +345,34 @@ export default function AdminDashboard() {
                         <h4>{dept.name}</h4>
                         <p>{dept.code} Faculty Branch</p>
                       </div>
-                      <ChevronRight size={20} className="dept-arrow" />
+                      <button className="btn-action demote" onClick={() => deleteDepartment(dept.id)} title="Delete Department">
+                        <X size={16} />
+                      </button>
                     </div>
                   ))}
                 </div>
               </div>
-            ) : activeTab === 'pending' ? (
+            ) : activeTab === 'materials' ? (
               <div className="admin-section animate-fade-in">
                 <div className="card">
                   <div className="section-header">
-                    <h2>Pending Approvals</h2>
+                    <h2>Course Materials Management</h2>
+                    <div className="admin-search">
+                      <Search size={16} />
+                      <input 
+                        type="text" 
+                        placeholder="Search materials..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
                   </div>
                   <div className="admin-table-wrapper">
-                    {filteredPending.length === 0 ? (
+                    {filteredMaterials.length === 0 ? (
                       <div className="admin-empty-state">
                         <ShieldCheck size={48} color="var(--primary)" />
-                        <h3>All caught up!</h3>
-                        <p>No materials waiting for approval.</p>
+                        <h3>No materials found</h3>
+                        <p>There are no active materials in your jurisdiction.</p>
                       </div>
                     ) : (
                       <table className="admin-table">
@@ -371,7 +385,7 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredPending.map(mat => (
+                          {filteredMaterials.map(mat => (
                             <tr key={mat.id}>
                               <td>
                                 <div className="user-name">{mat.title}</div>
@@ -381,10 +395,10 @@ export default function AdminDashboard() {
                               <td>{mat.uploader_name}</td>
                               <td>
                                 <div className="admin-actions">
-                                  <button className="btn-action promote" onClick={() => handleApprove(mat.id)}>
-                                    <Check size={14} />
-                                  </button>
-                                  <button className="btn-action demote" onClick={() => handleReject(mat.id)}>
+                                  <a href={`/api/materials/${mat.id}/download`} target="_blank" rel="noreferrer" className="btn-action promote" title="Preview">
+                                    <BookOpen size={14} />
+                                  </a>
+                                  <button className="btn-action demote" onClick={() => handleRevoke(mat.id)} title="Revoke and Delete">
                                     <X size={14} />
                                   </button>
                                 </div>

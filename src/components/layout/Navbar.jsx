@@ -13,7 +13,7 @@ export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef(null);
 
-  const completionPercentage = user
+  const completionPercentage = user?.totalMaterials
     ? Math.round((user.totalMaterialsRead / Math.max(user.totalMaterials, 1)) * 100)
     : 0;
 
@@ -56,7 +56,7 @@ export default function Navbar() {
           {/* Settings — text + icon like NotebookLM */}
           <button
             className="navbar-settings-btn"
-            onClick={() => navigate('/settings')}
+            onClick={() => alert('Settings page coming soon!')}
           >
             <Settings size={16} />
             <span>Settings</span>
@@ -81,10 +81,10 @@ export default function Navbar() {
           {/* Avatar with progress ring & Profile Modal */}
           <div className="navbar-profile-wrap" ref={modalRef} style={{ position: 'relative' }}>
             <ProgressRingAvatar
-              name={user?.name || 'S'}
+              name={user?.full_name || 'S'}
               avatar={user?.avatar}
               percentage={completionPercentage}
-              streak={user?.studyStreak || 0}
+              streak={user?.study_streak || 0}
               size={40}
               onClick={() => setIsModalOpen(!isModalOpen)}
             />

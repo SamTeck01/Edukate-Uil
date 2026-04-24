@@ -23,7 +23,7 @@ export default function ReaderNavbar({
   const navigate = useNavigate();
   const { user } = useApp();
 
-  const completionPercentage = user
+  const completionPercentage = user?.totalMaterials
     ? Math.round((user.totalMaterialsRead / Math.max(user.totalMaterials, 1)) * 100)
     : 0;
 
@@ -75,14 +75,16 @@ export default function ReaderNavbar({
             <Grid3x3 size={20} />
           </button>
 
-          <ProgressRingAvatar
-            name={user?.name || 'S'}
-            avatar={user?.avatar}
-            percentage={completionPercentage}
-            streak={user?.studyStreak || 0}
-            size={36}
-            onClick={() => navigate('/profile')}
-          />
+          <div className="navbar-profile-wrap" style={{ position: 'relative' }}>
+            <ProgressRingAvatar
+              name={user?.full_name || 'S'}
+              avatar={user?.avatar}
+              percentage={completionPercentage}
+              streak={user?.study_streak || 0}
+              size={40}
+              onClick={() => navigate('/profile')}
+            />
+          </div>
         </div>
       </div>
     </header>

@@ -49,9 +49,13 @@ export function AppProvider({ children }) {
 
   const login = useCallback(async (userData) => {
     if (!userData || !userData.email) return;
+    if (!userData.password) {
+      setIsLoading(false);
+      throw new Error("Password is required");
+    }
     setIsLoading(true);
     // Call the real authService which hits the API
-    const res = await authService.login(userData.email, userData.password || '123456');
+    const res = await authService.login(userData.email, userData.password);
     if (!res.error && res.user) {
       setUser(res.user);
       setIsAuthenticated(true);
@@ -65,8 +69,12 @@ export function AppProvider({ children }) {
 
   const signup = useCallback(async (userData) => {
     if (!userData || !userData.email) return;
+    if (!userData.password) {
+      setIsLoading(false);
+      throw new Error("Password is required");
+    }
     setIsLoading(true);
-    const res = await authService.signup(userData.email, userData.password || '123456', userData.name);
+    const res = await authService.signup(userData.email, userData.password, userData.name);
     if (!res.error && res.user) {
       setUser(res.user);
       setIsAuthenticated(true);

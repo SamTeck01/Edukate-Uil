@@ -14,10 +14,15 @@ export const apiClient = async (endpoint, options = {}) => {
     delete headers['Content-Type'];
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (networkError) {
+    throw new Error(`Network Error: Unable to connect to the server. Please check your internet connection.`);
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
