@@ -7,7 +7,7 @@ import './flashcardviewer.css';
  * Flashcard Viewer — interactive 3D flip cards.
  * Navigate with arrows, click/tap to flip. Persists via dataRef.
  */
-export default function FlashcardViewer({ materialId, dataRef }) {
+export default function FlashcardViewer({ materialId, dataRef, contextText }) {
   const [cards, setCards] = useState(dataRef.current || []);
   const [loading, setLoading] = useState(!dataRef.current);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -19,7 +19,7 @@ export default function FlashcardViewer({ materialId, dataRef }) {
     async function loadCards() {
       setLoading(true);
       try {
-        const data = await getFlashcards(materialId);
+        const data = await getFlashcards(materialId, contextText);
         setCards(data);
         dataRef.current = data;
       } catch (err) {

@@ -7,6 +7,7 @@ import CourseCard, { CreateNotebookCard } from '../components/cards/CourseCard';
 import { useApp } from '../context/AppContext';
 import { getCourses, searchCourses } from '../api/courseService';
 import { getRecentMaterials } from '../api/materialService';
+import EmptyState from '../components/shared/EmptyState';
 import './dashboardpage.css';
 
 const dashboardTabs = [
@@ -40,12 +41,13 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      const userDept = user?.department_id || user?.departmentId;
       try {
         const [coursesData, recentData] = await Promise.all([
           searchQuery
-            ? searchCourses(searchQuery, user?.departmentId)
-            : getCourses(user?.departmentId, user?.level),
-          getRecentMaterials(user?.id),
+            ? searchCourses(searchQuery, userDept)
+            : getCourses(userDept, user?.level),
+          getRecentMaterials(),
         ]);
         setCourses(coursesData);
         setRecentMats(recentData);
@@ -55,8 +57,11 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-    if (user?.departmentId) {
+    const userDept = user?.department_id || user?.departmentId;
+    if (userDept) {
       fetchData();
+    } else {
+      setLoading(false);
     }
   }, [user, searchQuery]);
 
@@ -65,7 +70,8 @@ export default function DashboardPage() {
     let sorted = [...courses];
 
     if (activeTab === 'dept') {
-      sorted = sorted.filter(c => c.departmentId === user?.departmentId);
+      const userDept = user?.department_id || user?.departmentId;
+      sorted = sorted.filter(c => (c.department_id || c.departmentId) === userDept);
     } else if (activeTab === 'bookmarked') {
       sorted = sorted.filter(c => c.completedCount > 0);
     }
@@ -87,11 +93,11 @@ export default function DashboardPage() {
   const recentAsCourses = useMemo(() => {
     return recentMats.map(mat => ({
       id: mat.id,
-      code: mat.courseCode,
+      code: mat.course_code || mat.courseCode,
       title: mat.title,
       icon: '📄',
       materialCount: 1,
-      completedCount: mat.isCompleted ? 1 : 0,
+      completedCount: (mat.is_completed || mat.isCompleted) ? 1 : 0,
       _isMaterial: true, // flag for click handling
     }));
   }, [recentMats]);
@@ -162,9 +168,21 @@ export default function DashboardPage() {
           ) : (
             <div className="dashboard-grid">
               <CreateNotebookCard onClick={handleCreateNotebook} />
-              {sortedCourses.map(course => (
-                <CourseCard key={course.id} course={course} />
-              ))}
+              {sortedCourses.length > 0 ? (
+                sortedCourses.map(course => (
+                  <CourseCard key={course.id} course={course} />
+                ))
+              ) : (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <EmptyState 
+                    title="No courses found" 
+                    description="We couldn't find any courses matching your filters. Try adjusting your search or department."
+                    imageUrl="/assets/empty-courses.png"
+                    actionLabel="View All Departments"
+                    onAction={() => setActiveTab('all')}
+                  />
+                </div>
+              )}
             </div>
           )}
         </section>

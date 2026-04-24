@@ -7,8 +7,43 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #525659; /* Dark gray like real PDF viewers */
+  background: #333; /* Dark background for iframe */
   position: relative;
+}
+
+.pdf-iframe {
+  border: none;
+  background: #f4f4f4;
+  transition: filter 0.3s ease;
+}
+
+.pdf-content-area--night {
+  background: #1a1a1a !important;
+}
+
+.pdf-content-area--night .pdf-iframe {
+  filter: invert(90%) hue-rotate(180deg) contrast(90%);
+}
+
+.pdf-topbar-btn--active {
+  background: rgba(37, 99, 235, 0.2) !important;
+  color: var(--primary) !important;
+}
+
+.pdf-status-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  color: #fff;
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.pdf-status-error {
+  color: #f87171;
 }
 
 /* ======= Top bar — page navigation + zoom ======= */
@@ -22,6 +57,24 @@
   border-bottom: 1px solid #2A2A2A;
   flex-shrink: 0;
   gap: var(--space-2);
+  position: relative; /* for progress bar */
+}
+
+.pdf-progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  z-index: 10;
+}
+
+.pdf-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pdf-topbar-left {
@@ -147,13 +200,11 @@
 /* ======= PDF content area — scrollable pages ======= */
 .pdf-content-area {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--space-6) var(--space-4) 120px var(--space-4);
+  overflow: hidden; /* Iframe handles its own scroll */
+  padding: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  scroll-behavior: smooth;
+  position: relative;
 }
 
 /* Individual PDF page — white sheet with shadow */

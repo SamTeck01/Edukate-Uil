@@ -5,8 +5,47 @@
 .summary-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.summary-header-left {
+  display: flex;
+  align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-5);
+}
+
+.summary-audio-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.summary-audio-btn:hover {
+  background: white;
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.summary-audio-btn--playing {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.summary-audio-btn--playing:hover {
+  background: #1d4ed8;
+  color: white;
 }
 
 .summary-icon {

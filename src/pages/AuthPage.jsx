@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/shared/Button';
@@ -18,8 +18,13 @@ export default function AuthPage() {
   const [error, setError] = useState('');
 
   // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated && isOnboarded) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, isOnboarded, navigate]);
+
   if (isAuthenticated && isOnboarded) {
-    navigate('/dashboard');
     return null;
   }
 
@@ -30,13 +35,13 @@ export default function AuthPage() {
 
     try {
       if (mode === 'login') {
-        login({ email });
+        await login({ email, password });
       } else {
-        signup({ email, name });
+        await signup({ email, password, name });
       }
       navigate(mode === 'login' ? '/dashboard' : '/onboarding');
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -49,6 +54,9 @@ export default function AuthPage() {
 
   return (
     <div className="auth-page">
+      <div className="auth-bg-blob auth-bg-blob--1" />
+      <div className="auth-bg-blob auth-bg-blob--2" />
+      
       <div className="auth-card animate-fade-in-up">
         {/* Header */}
         <div className="auth-header">

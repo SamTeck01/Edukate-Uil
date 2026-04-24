@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Check, X as XIcon, ChevronRight } from 'lucide-react';
-import { getQuiz } from '../../api/aiService';
+import { getQuiz, saveStudyResult } from '../../api/aiService';
+import { useToast } from '../../context/ToastContext';
 import './quizviewer.css';
 
 /**
  * Quiz Viewer — multiple choice questions with empathetic explanations.
  * Shows one question at a time. Persists via dataRef.
  */
-export default function QuizViewer({ materialId, dataRef }) {
+export default function QuizViewer({ materialId, dataRef, contextText }) {
   const [questions, setQuestions] = useState(dataRef.current?.questions || []);
   const [loading, setLoading] = useState(!dataRef.current);
   const [currentIndex, setCurrentIndex] = useState(dataRef.current?.currentIndex || 0);
@@ -15,6 +16,7 @@ export default function QuizViewer({ materialId, dataRef }) {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(dataRef.current?.score || 0);
   const [completed, setCompleted] = useState(dataRef.current?.completed || false);
+  const toast = useToast();
 
   useEffect(() => {
     if (dataRef.current?.questions) return;
@@ -22,7 +24,7 @@ export default function QuizViewer({ materialId, dataRef }) {
     async function loadQuiz() {
       setLoading(true);
       try {
-        const data = await getQuiz(materialId);
+        const data = await getQuiz(materialId, contextText);
         setQuestions(data);
         dataRef.current = { questions: data, currentIndex: 0, score: 0, completed: false };
       } catch (err) {
@@ -60,6 +62,9 @@ export default function QuizViewer({ materialId, dataRef }) {
       setShowResult(false);
     } else {
       setCompleted(true);
+      saveStudyResult(materialId, 'quiz', score, questions.length)
+        .then(() => toast.success('Quiz result saved to your profile!'))
+        .catch(() => toast.error('Failed to save quiz result.'));
     }
   };
 

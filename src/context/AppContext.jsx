@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { currentUser as mockUser, departments } from '../api/mockData';
+import * as authService from '../api/authService';
+import * as courseService from '../api/courseService';
 
 const AppContext = createContext(null);
 
@@ -8,63 +9,108 @@ export function AppProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [departments, setDepartments] = useState([]);
 
-  // Check for existing session on mount
+  // Fetch departments and check session on mount
   useEffect(() => {
-    const stored = localStorage.getItem('physci_user');
-    if (stored) {
+    const init = async () => {
+      // 1. Fetch departments
       try {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-        setIsAuthenticated(true);
-        setIsOnboarded(!!parsed.departmentId && !!parsed.level);
-      } catch {
-        localStorage.removeItem('physci_user');
+        const depts = await courseService.getDepartments();
+        setDepartments(depts || []);
+      } catch (err) {
+        console.error("Failed to fetch departments", err);
       }
+
+      // 2. Restore user session
+      const stored = localStorage.getItem('physci_user');
+      const token = localStorage.getItem('physci_token');
+      
+      if (stored && token) {
+        try {
+          const parsed = JSON.parse(stored);
+          setUser(parsed);
+          setIsAuthenticated(true);
+          // Support both old and new casing for safety, but token guarantees it's a real session
+          setIsOnboarded(!!(parsed.department_id || parsed.departmentId) && !!parsed.level);
+        } catch {
+          localStorage.removeItem('physci_user');
+          localStorage.removeItem('physci_token');
+        }
+      } else {
+        // Clear any partial/stale mock state
+        localStorage.removeItem('physci_user');
+        localStorage.removeItem('physci_token');
+      }
+      setIsLoading(false);
+    };
+    init();
+  }, []);
+
+  const login = useCallback(async (userData) => {
+    if (!userData || !userData.email) return;
+    setIsLoading(true);
+    // Call the real authService which hits the API
+    const res = await authService.login(userData.email, userData.password || '123456');
+    if (!res.error && res.user) {
+      setUser(res.user);
+      setIsAuthenticated(true);
+      setIsOnboarded(!!res.user.department_id && !!res.user.level);
+    } else {
+      console.error(res.error);
+      throw new Error(res.error);
     }
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((userData) => {
-    const u = userData || mockUser;
-    setUser(u);
-    setIsAuthenticated(true);
-    setIsOnboarded(!!u.departmentId && !!u.level);
-    localStorage.setItem('physci_user', JSON.stringify(u));
+  const signup = useCallback(async (userData) => {
+    if (!userData || !userData.email) return;
+    setIsLoading(true);
+    const res = await authService.signup(userData.email, userData.password || '123456', userData.name);
+    if (!res.error && res.user) {
+      setUser(res.user);
+      setIsAuthenticated(true);
+      setIsOnboarded(false);
+    } else {
+      console.error(res.error);
+      throw new Error(res.error);
+    }
+    setIsLoading(false);
   }, []);
 
-  const signup = useCallback((userData) => {
-    const u = { ...mockUser, ...userData, totalMaterialsRead: 0, studyStreak: 0, departmentId: null, level: null };
-    setUser(u);
-    setIsAuthenticated(true);
-    setIsOnboarded(false);
-    localStorage.setItem('physci_user', JSON.stringify(u));
+  const completeOnboarding = useCallback(async (department_id, level) => {
+    setIsLoading(true);
+    try {
+      const res = await authService.updateProfile({ department_id, level });
+      if (!res.error && res.user) {
+        setUser(res.user);
+        setIsOnboarded(true);
+      }
+    } catch (err) {
+      console.error("Failed to complete onboarding", err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const completeOnboarding = useCallback((departmentId, level) => {
-    const updated = { ...user, departmentId, level };
-    setUser(updated);
-    setIsOnboarded(true);
-    localStorage.setItem('physci_user', JSON.stringify(updated));
-  }, [user]);
-
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await authService.logout();
     setUser(null);
     setIsAuthenticated(false);
     setIsOnboarded(false);
-    localStorage.removeItem('physci_user');
   }, []);
 
-  const updateUser = useCallback((updates) => {
-    const updated = { ...user, ...updates };
-    setUser(updated);
-    localStorage.setItem('physci_user', JSON.stringify(updated));
-  }, [user]);
+  const updateUser = useCallback(async (updates) => {
+    const res = await authService.updateProfile(updates);
+    if (!res.error && res.user) {
+      setUser(res.user);
+    }
+  }, []);
 
   const getUserDepartment = useCallback(() => {
-    if (!user?.departmentId) return null;
-    return departments.find(d => d.id === user.departmentId) || null;
-  }, [user]);
+    if (!user?.department_id || departments.length === 0) return null;
+    return departments.find(d => d.id === user.department_id) || null;
+  }, [user, departments]);
 
   const value = {
     user,

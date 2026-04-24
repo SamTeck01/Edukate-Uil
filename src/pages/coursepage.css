@@ -181,6 +181,10 @@
   width: 100%;
 }
 
+.course-material-item--private {
+  border-left: 4px solid var(--accent);
+}
+
 .course-material-item:hover {
   border-color: var(--border);
   box-shadow: var(--shadow-sm);
@@ -216,6 +220,14 @@
 
 .course-material-info {
   min-width: 0;
+  flex: 1;
+}
+
+.course-material-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .course-material-title {
@@ -232,6 +244,26 @@
   font-size: var(--text-xs);
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+.badge-private, .badge-official {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.badge-private {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.badge-official {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--primary);
 }
 
 .course-material-right {

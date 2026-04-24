@@ -1,24 +1,43 @@
-import { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Play, RotateCcw } from 'lucide-react';
 import { getSummary } from '../../api/aiService';
 import './summaryview.css';
 
-/**
- * Summary View — AI-generated 3-paragraph summary with streaming.
- * Persists via dataRef so content survives bottom sheet close/open.
- */
-export default function SummaryView({ materialId, dataRef }) {
+export default function SummaryView({ materialId, dataRef, contextText }) {
   const [summary, setSummary] = useState(dataRef.current || '');
   const [loading, setLoading] = useState(!dataRef.current);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechInstance, setSpeechInstance] = useState(null);
+
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const utterance = new SpeechSynthesisUtterance(summary);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+      setSpeechInstance(utterance);
+      setIsSpeaking(true);
+    }
+  };
 
   useEffect(() => {
-    if (dataRef.current) return; // Already loaded
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dataRef.current) return;
 
     let cancelled = false;
 
     async function loadSummary() {
       setLoading(true);
       try {
-        const result = await getSummary(materialId, (chunk) => {
+        const result = await getSummary(materialId, contextText, (chunk) => {
           if (!cancelled) setSummary(chunk);
         });
         if (!cancelled) {
@@ -39,8 +58,20 @@ export default function SummaryView({ materialId, dataRef }) {
   return (
     <div className="summary-view">
       <div className="summary-header">
-        <span className="summary-icon">📝</span>
-        <h3 className="summary-title">AI Summary</h3>
+        <div className="summary-header-left">
+          <span className="summary-icon">📝</span>
+          <h3 className="summary-title">AI Summary</h3>
+        </div>
+        {summary && !loading && (
+          <button 
+            className={`summary-audio-btn ${isSpeaking ? 'summary-audio-btn--playing' : ''}`}
+            onClick={toggleSpeech}
+            title={isSpeaking ? "Stop listening" : "Listen to summary"}
+          >
+            {isSpeaking ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            <span>{isSpeaking ? "Stop" : "Listen"}</span>
+          </button>
+        )}
       </div>
 
       {loading && !summary ? (

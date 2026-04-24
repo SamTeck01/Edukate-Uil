@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, Search } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import Button from '../components/shared/Button';
+import UploadModal from '../components/layout/UploadModal';
 import { useApp } from '../context/AppContext';
 import { getCourseById } from '../api/courseService';
 import { getMaterialsByCourse } from '../api/materialService';
@@ -17,23 +18,25 @@ export default function CoursePage() {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [courseData, matsData] = await Promise.all([
+        getCourseById(courseId),
+        getMaterialsByCourse(courseId),
+      ]);
+      setCourse(courseData);
+      setMaterials(matsData);
+    } catch (err) {
+      console.error('Failed to load course:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const [courseData, matsData] = await Promise.all([
-          getCourseById(courseId),
-          getMaterialsByCourse(courseId),
-        ]);
-        setCourse(courseData);
-        setMaterials(matsData);
-      } catch (err) {
-        console.error('Failed to load course:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
   }, [courseId]);
 
@@ -41,7 +44,7 @@ export default function CoursePage() {
     m.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const completedCount = materials.filter(m => m.isCompleted).length;
+  const completedCount = materials.filter(m => m.is_completed || m.isCompleted).length;
   const progress = materials.length > 0 ? Math.round((completedCount / materials.length) * 100) : 0;
 
   if (loading) {
@@ -111,9 +114,14 @@ export default function CoursePage() {
               className="course-search-input"
             />
           </div>
-          {user?.role === 'moderator' && (
-            <Button variant="secondary" size="sm" icon={Upload}>Upload Material</Button>
-          )}
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            icon={Upload}
+            onClick={() => setIsUploadModalOpen(true)}
+          >
+            Upload Material
+          </Button>
         </div>
 
         {/* Materials list */}
@@ -126,32 +134,44 @@ export default function CoursePage() {
             filteredMaterials.map((mat, i) => (
               <button
                 key={mat.id}
-                className="course-material-item animate-fade-in-up"
+                className={`course-material-item animate-fade-in-up ${mat.status === 'private' ? 'course-material-item--private' : ''}`}
                 style={{ animationDelay: `${i * 0.04}s` }}
                 onClick={() => navigate(`/reader/${mat.id}`)}
               >
                 <div className="course-material-left">
-                  <div className={`course-material-check ${mat.isCompleted ? 'course-material-check--done' : ''}`}>
-                    {mat.isCompleted && '✓'}
+                  <div className={`course-material-check ${(mat.is_completed || mat.isCompleted) ? 'course-material-check--done' : ''}`}>
+                    {(mat.is_completed || mat.isCompleted) && '✓'}
                   </div>
                   <div className="course-material-info">
-                    <h3 className="course-material-title">{mat.title}</h3>
+                    <div className="course-material-title-row">
+                      <h3 className="course-material-title">{mat.title}</h3>
+                      {mat.status === 'private' && <span className="badge-private">Private</span>}
+                      {mat.status === 'active' && <span className="badge-official">Official</span>}
+                    </div>
                     <p className="course-material-meta">
-                      {mat.pageCount} pages · {mat.readCount} readers · by {mat.uploadedByName}
+                      {mat.page_count || mat.pageCount || '?'} pages · by {mat.status === 'private' ? 'You' : (mat.uploader_name || 'System')}
                     </p>
                   </div>
                 </div>
                 <div className="course-material-right">
-                  {mat.lastReadPage > 0 && !mat.isCompleted && (
-                    <span className="course-material-bookmark">pg {mat.lastReadPage}/{mat.pageCount}</span>
+                  {(mat.last_read_page || mat.lastReadPage) > 0 && !(mat.is_completed || mat.isCompleted) && (
+                    <span className="course-material-bookmark">pg {mat.last_read_page || mat.lastReadPage}/{mat.page_count || mat.pageCount || '?'}</span>
                   )}
-                  <span className="course-material-type">{mat.type.toUpperCase()}</span>
+                  <span className="course-material-type">PDF</span>
                 </div>
               </button>
             ))
           )}
         </div>
       </main>
+
+      {isUploadModalOpen && (
+        <UploadModal 
+          course={course} 
+          onClose={() => setIsUploadModalOpen(false)} 
+          onUploadSuccess={fetchData} 
+        />
+      )}
     </div>
   );
 }

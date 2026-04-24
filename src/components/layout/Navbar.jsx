@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Grid3x3 } from 'lucide-react';
+import { Settings, Grid3x3, ShieldCheck } from 'lucide-react';
 import ProgressRingAvatar from '../shared/ProgressRingAvatar';
 import ProfileModal from './ProfileModal';
 import { useApp } from '../../context/AppContext';
@@ -61,6 +61,17 @@ export default function Navbar() {
             <Settings size={16} />
             <span>Settings</span>
           </button>
+
+          {/* Buhari's Admin Boss Mode or Moderator Access */}
+          {(user?.role === 'admin' || user?.role === 'moderator') && (
+            <button
+              className="navbar-settings-btn navbar-admin-btn"
+              onClick={() => navigate('/admin')}
+            >
+              <ShieldCheck size={16} />
+              <span>{user?.role === 'admin' ? 'Admin' : 'Dashboard'}</span>
+            </button>
+          )}
 
           {/* Grid icon — like NotebookLM's 9-dot grid */}
           <button className="navbar-icon-btn" aria-label="Menu">

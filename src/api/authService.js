@@ -1,73 +1,92 @@
-/**
- * Auth Service — handles login, signup, user profile
- * Swap the implementations for real Supabase Auth later.
- */
-import { currentUser, departments, delay } from './mockData';
+import { apiClient } from './apiClient';
 
 let _user = null;
-let _isOnboarded = false;
+
+// Try to restore user from localStorage on init
+try {
+  const storedUser = localStorage.getItem('physci_user');
+  if (storedUser) {
+    _user = JSON.parse(storedUser);
+  }
+} catch (e) {
+  console.error('Failed to restore user', e);
+}
 
 export async function login(email, password) {
-  await delay(600);
-  // In production: return supabase.auth.signInWithPassword({ email, password })
-  if (email && password) {
-    _user = { ...currentUser, email };
+  try {
+    const data = await apiClient('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    
+    _user = data.user;
+    localStorage.setItem('physci_token', data.token);
+    localStorage.setItem('physci_user', JSON.stringify(_user));
+    
     return { user: _user, error: null };
+  } catch (error) {
+    return { user: null, error: error.message };
   }
-  return { user: null, error: 'Invalid credentials' };
 }
 
 export async function signup(email, password, name) {
-  await delay(800);
-  // In production: return supabase.auth.signUp({ email, password, options: { data: { name } } })
-  if (email && password && name) {
-    _user = { ...currentUser, email, name, totalMaterialsRead: 0, studyStreak: 0 };
-    _isOnboarded = false;
+  try {
+    const data = await apiClient('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, full_name: name }),
+    });
+    
+    _user = data.user;
+    localStorage.setItem('physci_token', data.token);
+    localStorage.setItem('physci_user', JSON.stringify(_user));
+    
     return { user: _user, error: null };
+  } catch (error) {
+    return { user: null, error: error.message };
   }
-  return { user: null, error: 'All fields are required' };
 }
 
 export async function loginWithGoogle() {
-  await delay(500);
-  // In production: return supabase.auth.signInWithOAuth({ provider: 'google' })
-  _user = { ...currentUser };
-  return { user: _user, error: null };
+  return { user: null, error: 'Google login not implemented yet.' };
 }
 
 export async function logout() {
-  await delay(200);
   _user = null;
+  localStorage.removeItem('physci_token');
+  localStorage.removeItem('physci_user');
   return { error: null };
 }
 
 export async function getCurrentUser() {
-  await delay(200);
-  // In production: check supabase.auth.getUser() + fetch profile from DB
   return _user;
 }
 
 export async function updateProfile(updates) {
-  await delay(400);
-  // In production: supabase.from('profiles').update(updates).eq('id', user.id)
-  if (_user) {
-    _user = { ..._user, ...updates };
-    _isOnboarded = true;
+  try {
+    const data = await apiClient('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+    
+    _user = data.user;
+    localStorage.setItem('physci_user', JSON.stringify(_user));
+    
+    return { user: _user, error: null };
+  } catch (error) {
+    return { user: _user, error: error.message };
   }
-  return { user: _user, error: null };
 }
 
 export async function isUserOnboarded() {
-  await delay(100);
-  return _isOnboarded && _user?.departmentId && _user?.level;
+  // Check if department is set
+  return !!(_user?.department_id && _user?.level);
 }
 
+// Kept for backwards compatibility with UI before we fetch from API
 export function getDepartments() {
-  return departments;
+  return []; 
 }
 
-// Set user directly (for mock flow)
 export function setMockUser(user) {
   _user = user;
-  _isOnboarded = true;
 }

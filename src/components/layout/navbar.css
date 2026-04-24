@@ -102,6 +102,16 @@
   color: var(--text);
 }
 
+.navbar-admin-btn {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+
+.navbar-admin-btn:hover {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
 /* Grid icon button */
 .navbar-icon-btn {
   width: 40px;

@@ -1,23 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Layers, HelpCircle, MessageCircle, ChevronUp, ChevronDown, ZoomIn, ZoomOut, Maximize2, Minimize2, Download, ArrowLeft } from 'lucide-react';
+import { 
+  FileText, Layers, HelpCircle, MessageCircle, 
+  Download, ArrowLeft, Loader2, Moon, Sun 
+} from 'lucide-react';
+import { updateReadProgress } from '../../api/materialService';
 import './pdfviewer.css';
 
-/**
- * PDF Viewer — THE main component of PhySci Hub.
- *
- * This is what students came here for: reading their PDFs.
- * In production, integrate react-pdf / pdf.js here.
- *
- * Features:
- * - Simulated multi-page PDF content
- * - Page navigation (up/down arrows, page input)
- * - Zoom controls
- * - Maximize toggle
- * - Bottom toolbar with AI tools (hides on scroll up, shows on scroll down)
- *   → Summary | Flashcards | Quiz | Ask Buhari
- * - On mobile, these tools open as bottom sheets (handled by parent)
- */
 export default function PdfViewer({
   material,
   isMaximized,
@@ -27,24 +16,140 @@ export default function PdfViewer({
   onOpenChat,
   activeSheet,
   onScrollVisibilityChange,
+  onTextExtracted, // New prop to pass text to parent
 }) {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(material?.lastReadPage || 1);
-  const [zoom, setZoom] = useState(100);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(material?.last_read_page || 1);
   const [toolbarVisible, setToolbarVisible] = useState(true);
-  const totalPages = material?.pageCount || 1;
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(material?.is_completed || material?.isCompleted || false);
+  const [isNightMode, setIsNightMode] = useState(false);
+  
   const contentRef = useRef(null);
   const lastScrollY = useRef(0);
+  const progressTimerRef = useRef(null);
 
-  // Auto-hide toolbar on scroll + notify parent for bottom bar
+  // Fetch the PDF blob and extract text
+  useEffect(() => {
+    async function fetchAndProcessPdf() {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('physci_token');
+        const baseUrl = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${baseUrl}/materials/${material.id}/download`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to download PDF');
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setPdfUrl(url);
+
+        // Load PDF.js from CDN and extract text for AI
+        await extractTextFromBlob(blob);
+
+      } catch (err) {
+        console.error('PDF error:', err);
+        setError('Could not load PDF file. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function extractTextFromBlob(blob) {
+      try {
+        // Load PDF.js dynamically
+        if (!window.pdfjsLib) {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          document.head.appendChild(script);
+          await new Promise(r => script.onload = r);
+        }
+
+        const pdfjsLib = window.pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const arrayBuffer = await blob.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        let fullText = '';
+        const maxPages = Math.min(pdf.numPages, 10); // Limit to first 10 pages for speed/tokens
+        
+        for (let i = 1; i <= maxPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ');
+          fullText += pageText + '\n';
+        }
+
+        onTextExtracted?.(fullText);
+      } catch (e) {
+        console.warn('Text extraction failed:', e);
+        // Fallback to title if extraction fails
+        onTextExtracted?.(`Document Title: ${material.title}`);
+      }
+    }
+
+    if (material?.id) {
+      fetchAndProcessPdf();
+    }
+
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [material.id]);
+
+  // Periodically save progress
+  useEffect(() => {
+    if (!material?.id) return;
+
+    progressTimerRef.current = setInterval(() => {
+      updateReadProgress(material.id, currentPage);
+    }, 30000);
+
+    return () => {
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+      }
+      updateReadProgress(material.id, currentPage);
+    };
+  }, [material.id, currentPage]);
+
   const handleScroll = useCallback(() => {
     if (!contentRef.current) return;
-    const y = contentRef.current.scrollTop;
+    const el = contentRef.current;
+    const y = el.scrollTop;
+    
+    // Calculate progress
+    const winScroll = el.scrollTop;
+    const height = el.scrollHeight - el.clientHeight;
+    if (height > 0) {
+      const progressPercent = (winScroll / height) * 100;
+      setScrollProgress(progressPercent);
+      
+      // Auto-complete if > 95% scrolled
+      if (progressPercent > 95 && !isCompleted) {
+        setIsCompleted(true);
+        updateReadProgress(material.id, currentPage, true);
+      }
+    }
+
     const isScrollingDown = y > lastScrollY.current && y > 40;
     setToolbarVisible(!isScrollingDown);
     onScrollVisibilityChange?.(!isScrollingDown);
     lastScrollY.current = y;
-  }, [onScrollVisibilityChange]);
+  }, [onScrollVisibilityChange, isCompleted, material.id, currentPage]);
 
   useEffect(() => {
     const el = contentRef.current;
@@ -53,91 +158,24 @@ export default function PdfViewer({
     return () => el.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const goToPage = (page) => {
-    const p = Math.max(1, Math.min(totalPages, page));
-    setCurrentPage(p);
-  };
-
-  const zoomIn = () => setZoom(z => Math.min(200, z + 25));
-  const zoomOut = () => setZoom(z => Math.max(50, z - 25));
-
-  // Simulate PDF pages with actual content
-  const renderMockPages = () => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <div
-          key={i}
-          className="pdf-page"
-          id={`pdf-page-${i}`}
-          style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-        >
-          <div className="pdf-page-inner">
-            {/* Page header */}
-            <div className="pdf-page-header">
-              <span className="pdf-page-course">{material.courseCode}</span>
-              <span className="pdf-page-num">Page {i}</span>
-            </div>
-
-            {/* Page content — simulated text blocks */}
-            {i === 1 ? (
-              <>
-                <h1 className="pdf-content-title">{material.title}</h1>
-                <p className="pdf-content-author">Uploaded by {material.uploadedByName}</p>
-                <div className="pdf-content-divider" />
-                <p className="pdf-content-text">
-                  This document provides comprehensive coverage of the key concepts, theories, and problem-solving techniques essential for mastering this subject. Students are advised to read through each section carefully and attempt the practice questions at the end of each chapter.
-                </p>
-                <p className="pdf-content-text">
-                  The material has been organized in a logical sequence, building from fundamental principles to more advanced applications. Cross-references to related topics are provided to help establish connections between different areas of study.
-                </p>
-                <h2 className="pdf-content-h2">1. Introduction</h2>
-                <p className="pdf-content-text">
-                  The study of physical sciences requires a strong foundation in both theoretical concepts and practical applications. This section introduces the core framework that will be developed throughout the remainder of the document.
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="pdf-content-h2">{i}. Section {i} — Core Concepts</h2>
-                <p className="pdf-content-text">
-                  Building on the principles established in previous sections, this chapter explores the deeper implications and applications of the theoretical framework. Particular attention should be paid to the mathematical derivations, as they form the basis for problem-solving in examinations.
-                </p>
-                <div className="pdf-content-formula">
-                  ΔG = ΔH − TΔS
-                </div>
-                <p className="pdf-content-text">
-                  The relationship above demonstrates the interplay between enthalpy, entropy, and temperature in determining the spontaneity of a process. Students should be able to apply this equation to predict reaction feasibility under various conditions.
-                </p>
-                <h3 className="pdf-content-h3">{i}.1 Key Definitions</h3>
-                <ul className="pdf-content-list">
-                  <li>• Thermodynamic equilibrium — state of maximum entropy</li>
-                  <li>• Activation energy — minimum energy for reaction</li>
-                  <li>• Rate constant — proportionality factor in rate law</li>
-                  <li>• Standard conditions — 298K, 1 atm, 1M concentration</li>
-                </ul>
-                <h3 className="pdf-content-h3">{i}.2 Worked Examples</h3>
-                <p className="pdf-content-text">
-                  Example {i}.1: Calculate the crystal field splitting energy for a d⁶ octahedral complex given that the complex absorbs light at 520 nm. Determine whether the complex is high-spin or low-spin.
-                </p>
-              </>
-            )}
-
-            {/* Page footer */}
-            <div className="pdf-page-footer">
-              <span>{material.title}</span>
-              <span>{i} / {totalPages}</span>
-            </div>
-          </div>
-        </div>
-      );
+  const handleDownload = () => {
+    if (pdfUrl) {
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `${material.title || 'material'}.pdf`;
+      link.click();
     }
-    return pages;
   };
 
   return (
     <div className="pdf-viewer">
-      {/* Top bar — page number + zoom + maximize */}
+      {/* Top bar */}
       <div className="pdf-topbar">
+        {/* Reading progress line */}
+        <div className="pdf-progress-container">
+          <div className="pdf-progress-bar" style={{ width: `${scrollProgress}%` }} />
+        </div>
+
         <div className="pdf-topbar-left">
           <button className="pdf-topbar-back" onClick={() => navigate('/dashboard')} title="Back to dashboard">
             <ArrowLeft size={18} />
@@ -145,46 +183,43 @@ export default function PdfViewer({
           <span className="pdf-topbar-label">{material.title}</span>
         </div>
 
-        <div className="pdf-topbar-center">
-          <button className="pdf-topbar-btn" onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}>
-            <ChevronUp size={16} />
-          </button>
-          <div className="pdf-page-indicator">
-            <input
-              type="number"
-              className="pdf-page-input"
-              value={currentPage}
-              min={1}
-              max={totalPages}
-              onChange={(e) => goToPage(parseInt(e.target.value) || 1)}
-            />
-            <span className="pdf-page-total">/ {totalPages}</span>
-          </div>
-          <button className="pdf-topbar-btn" onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= totalPages}>
-            <ChevronDown size={16} />
-          </button>
-        </div>
-
         <div className="pdf-topbar-right">
-          <button className="pdf-topbar-btn" onClick={zoomOut} disabled={zoom <= 50}>
-            <ZoomOut size={16} />
+          <button 
+            className={`pdf-topbar-btn ${isNightMode ? 'pdf-topbar-btn--active' : ''}`} 
+            onClick={() => setIsNightMode(!isNightMode)} 
+            title="Night Mode"
+          >
+            {isNightMode ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <span className="pdf-zoom-label">{zoom}%</span>
-          <button className="pdf-topbar-btn" onClick={zoomIn} disabled={zoom >= 200}>
-            <ZoomIn size={16} />
-          </button>
-          <button className="pdf-topbar-btn" aria-label="Download">
+          <button className="pdf-topbar-btn" onClick={handleDownload} title="Download">
             <Download size={16} />
           </button>
         </div>
       </div>
 
-      {/* PDF content — scrollable pages */}
-      <div className="pdf-content-area" ref={contentRef}>
-        {renderMockPages()}
+      {/* PDF content */}
+      <div className={`pdf-content-area ${isNightMode ? 'pdf-content-area--night' : ''}`} ref={contentRef}>
+        {loading ? (
+          <div className="pdf-status-message">
+            <Loader2 className="animate-spin" size={24} />
+            <p>Processing document...</p>
+          </div>
+        ) : error ? (
+          <div className="pdf-status-message pdf-status-error">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <iframe 
+            src={`${pdfUrl}#toolbar=0&navpanes=0`} 
+            className="pdf-iframe" 
+            title={material.title}
+            width="100%"
+            height="100%"
+          />
+        )}
       </div>
 
-      {/* Bottom toolbar — AI tools (hides on scroll up) */}
+      {/* Bottom toolbar */}
       <div className={`pdf-toolbar ${toolbarVisible ? '' : 'pdf-toolbar--hidden'}`}>
         <div className="pdf-toolbar-inner">
           <button

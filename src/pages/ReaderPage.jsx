@@ -58,6 +58,9 @@ export default function ReaderPage() {
   const summaryDataRef = useRef(null);
   const flashcardsDataRef = useRef(null);
   const quizDataRef = useRef(null);
+  
+  // Document context for AI
+  const [extractedText, setExtractedText] = useState('');
 
   // Fetch material + course data
   useEffect(() => {
@@ -184,6 +187,7 @@ export default function ReaderPage() {
             onOpenChat={() => openSheet('mobileChat')}
             activeSheet={activeSheet}
             onScrollVisibilityChange={setBottomBarVisible}
+            onTextExtracted={setExtractedText}
           />
         </main>
 
@@ -196,6 +200,7 @@ export default function ReaderPage() {
             <ChatPanel
               materialId={materialId}
               historyRef={chatHistoryRef}
+              contextText={extractedText}
             />
           </aside>
         )}
@@ -212,7 +217,7 @@ export default function ReaderPage() {
       {activeSheet && (
         <BottomSheet onClose={closeSheet} title={sheetTitles[activeSheet] || ''}>
           {activeSheet === 'mobileChat' && (
-            <ChatPanel materialId={materialId} historyRef={chatHistoryRef} />
+            <ChatPanel materialId={materialId} historyRef={chatHistoryRef} contextText={extractedText} />
           )}
           {activeSheet === 'mobileSources' && (
             <SourcesPanel
@@ -223,13 +228,13 @@ export default function ReaderPage() {
             />
           )}
           {activeSheet === 'summary' && (
-            <SummaryView materialId={materialId} dataRef={summaryDataRef} />
+            <SummaryView materialId={materialId} dataRef={summaryDataRef} contextText={extractedText} />
           )}
           {activeSheet === 'flashcards' && (
-            <FlashcardViewer materialId={materialId} dataRef={flashcardsDataRef} />
+            <FlashcardViewer materialId={materialId} dataRef={flashcardsDataRef} contextText={extractedText} />
           )}
           {activeSheet === 'quiz' && (
-            <QuizViewer materialId={materialId} dataRef={quizDataRef} />
+            <QuizViewer materialId={materialId} dataRef={quizDataRef} contextText={extractedText} />
           )}
         </BottomSheet>
       )}

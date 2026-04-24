@@ -7,7 +7,7 @@ import './chatpanel.css';
  * Chat panel — "Ask Buhari" AI tutor.
  * Uses historyRef to persist chat between bottom sheet open/close.
  */
-export default function ChatPanel({ materialId, historyRef }) {
+export default function ChatPanel({ materialId, historyRef, contextText }) {
   const [messages, setMessages] = useState(historyRef.current || []);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -46,6 +46,7 @@ export default function ChatPanel({ materialId, historyRef }) {
         materialId,
         userMsg.content,
         messages,
+        contextText,
         (chunk) => setStreamingText(chunk)
       );
 
@@ -111,7 +112,7 @@ export default function ChatPanel({ materialId, historyRef }) {
 
         {/* Streaming response */}
         {isTyping && streamingText && (
-          <div className="chat-msg chat-msg--assistant">
+          <div className="chat-msg chat-msg--assistant typing">
             <span className="chat-msg-avatar">🤖</span>
             <div className="chat-msg-bubble">
               <p className="chat-msg-text">{streamingText}<span className="chat-cursor" /></p>

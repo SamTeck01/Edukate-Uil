@@ -28,7 +28,7 @@ export default function CourseCard({ course, onClick }) {
   };
 
   return (
-    <div className="course-card" onClick={handleClick}>
+    <div className="course-card card-hover" onClick={handleClick}>
       {/* 3-dot menu — always visible like NotebookLM */}
       <button
         className="course-card-dots"
@@ -76,7 +76,7 @@ export default function CourseCard({ course, onClick }) {
  */
 export function CreateNotebookCard({ onClick }) {
   return (
-    <button className="course-card course-card--create" onClick={onClick}>
+    <button className="course-card course-card--create card-hover" onClick={onClick}>
       <div className="course-card-create-plus">
         <span>+</span>
       </div>
