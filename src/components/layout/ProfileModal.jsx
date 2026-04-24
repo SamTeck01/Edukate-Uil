@@ -1,18 +1,24 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Settings } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { useApp } from '../../context/AppContext';
 import './profilemodal.css';
 
 export default function ProfileModal({ user, dept, completionPercentage, onClose }) {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    // In a real app, call sign out API here
-    onClose();
-    navigate('/auth');
-  };
-
+  const { logout } = useApp();
   const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      onClose();
+      navigate('/auth');
+    } catch (err) {
+      toast.error('Failed to sign out');
+    }
+  };
 
   const handleSettings = () => {
     onClose();
